@@ -21,7 +21,7 @@ class Sequential:
 
     def start(self):
         '''Used once to get the initial observations.'''
-        observations = [env.reset() for env in self.environments]
+        observations = [env.reset()[0] for env in self.environments]
         self.lengths = np.zeros(len(self.environments), int)
         return np.array(observations, np.float32)
 
@@ -33,7 +33,7 @@ class Sequential:
         observations = []  # Observations for the actions selection.
 
         for i in range(len(self.environments)):
-            ob, rew, term, _ = self.environments[i].step(actions[i])
+            ob, rew, term, done, info = self.environments[i].step(actions[i])
 
             self.lengths[i] += 1
             # Timeouts trigger resets but are not true terminations.
@@ -44,7 +44,7 @@ class Sequential:
             terminations.append(term)
 
             if reset:
-                ob = self.environments[i].reset()
+                ob = self.environments[i].reset()[0]
                 self.lengths[i] = 0
 
             observations.append(ob)
@@ -53,8 +53,8 @@ class Sequential:
         infos = dict(
             observations=np.array(next_observations, np.float32),
             rewards=np.array(rewards, np.float32),
-            resets=np.array(resets, np.bool),
-            terminations=np.array(terminations, np.bool))
+            resets=np.array(resets, np.bool_),
+            terminations=np.array(terminations, np.bool_))
         return observations, infos
 
     def render(self, mode='human', *args, **kwargs):
@@ -127,9 +127,9 @@ class Parallel:
         self.rewards_list = np.zeros(
             (self.worker_groups, self.workers_per_group), np.float32)
         self.resets_list = np.zeros(
-            (self.worker_groups, self.workers_per_group), np.bool)
+            (self.worker_groups, self.workers_per_group), np.bool_)
         self.terminations_list = np.zeros(
-            (self.worker_groups, self.workers_per_group), np.bool)
+            (self.worker_groups, self.workers_per_group), np.bool_)
 
         return np.concatenate(self.observations_list)
 
