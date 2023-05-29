@@ -41,8 +41,8 @@ class A2C(agents.Agent):
     def step(self, observations, steps):
         # Sample actions and get their log-probabilities for training.
         actions, log_probs = self._step(observations)
-        actions = actions.numpy()
-        log_probs = log_probs.numpy()
+        actions = actions.cpu().numpy()
+        log_probs = log_probs.cpu().numpy()
 
         # Keep some values for the next update.
         self.last_observations = observations.copy()
@@ -53,7 +53,7 @@ class A2C(agents.Agent):
 
     def test_step(self, observations, steps):
         # Sample actions for testing.
-        return self._test_step(observations).numpy()
+        return self._test_step(observations).cpu().numpy()
 
     def update(self, observations, rewards, resets, terminations, steps):
         # Store the last transitions in the replay.
