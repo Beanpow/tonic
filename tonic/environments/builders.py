@@ -5,6 +5,10 @@ import os
 import gym.wrappers
 import numpy as np
 
+import sys
+sys.path.append("../../../..")
+from wrapper import Torque2ActWrapper
+
 from tonic import environments
 from tonic.utils import logger
 
@@ -13,7 +17,10 @@ def gym_environment(*args, **kwargs):
     '''Returns a wrapped Gym environment.'''
 
     def _builder(*args, **kwargs):
-        return gym.make(*args, **kwargs)
+        env = gym.make(*args, **kwargs).unwrapped
+        env1 = gym.make(*args, **kwargs).unwrapped
+        env = gym.wrappers.TimeLimit(Torque2ActWrapper(env, env1))
+        return env
 
     return build_environment(_builder, *args, **kwargs)
 
