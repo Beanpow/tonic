@@ -33,11 +33,11 @@ class Sequential:
         observations = []  # Observations for the actions selection.
 
         for i in range(len(self.environments)):
-            ob, rew, term, done, info = self.environments[i].step(actions[i])
+            ob, rew, term, truncated, info = self.environments[i].step(actions[i])
 
             self.lengths[i] += 1
             # Timeouts trigger resets but are not true terminations.
-            reset = term or self.lengths[i] == self.max_episode_steps
+            reset = term or self.lengths[i] == self.max_episode_steps or truncated
             next_observations.append(ob)
             rewards.append(rew)
             resets.append(reset)
